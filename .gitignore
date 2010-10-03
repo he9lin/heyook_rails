@@ -1,0 +1,4 @@
+*.sqlite3
+spec/database.yml
+spec/debug.log
+.bundle

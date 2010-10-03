@@ -1,0 +1,1 @@
+require 'heyook_rails'
