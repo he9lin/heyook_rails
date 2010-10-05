@@ -6,7 +6,7 @@ module HeyookRails
     
     module InstanceMethods
       def roles=(roles)                  
-        self.roles_mask = (roles & defined_roles).map { |r| 2**defined_roles.index(r) }.sum
+        self.roles_mask = (roles & defined_roles).map { |r| 2**defined_roles.index(r) }.sum 
       end
 
       def roles
@@ -15,16 +15,26 @@ module HeyookRails
 
       def role?(role)
         roles.include? role.to_s
-      end   
+      end
     end  
     
     module ClassMethods
       def has_roles *roles
-        cattr_accessor :defined_roles
+        
+        raise "Must specify at least one role" if roles.empty?          
+        
+        cattr_accessor :defined_roles, :default_role 
+        
+        self.default_role = roles.extract_options![:default].to_s
+        self.default_role ||= roles.last.to_s
+        self.default_role.freeze
+        
         self.defined_roles = roles.dup.map(&:to_s).freeze
         
         scope :with_role, lambda { |role| where("roles_mask & #{2**defined_roles.index(role.to_s)} > 0") }  
-                             
+        
+        before_save { self.roles = Array.wrap(default_role) }
+
         include HeyookRails::HasRoles::InstanceMethods
         
         defined_roles.each do |role|
