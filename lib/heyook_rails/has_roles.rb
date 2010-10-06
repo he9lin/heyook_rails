@@ -24,7 +24,6 @@ module HeyookRails
         raise "Must specify at least one role" if roles.empty?          
         
         cattr_accessor :defined_roles, :default_role 
-        
         self.default_role = roles.extract_options![:default].to_s
         self.default_role ||= roles.last.to_s
         self.default_role.freeze
